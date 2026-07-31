@@ -1,46 +1,78 @@
 # Mozart - terminal music player
 
-A minimal and suckless TUI music player
+A fast, minimal and suckless TUI music player.
 
 ## Dependencies
 
 - libVLC
-- ncursesw
+- FTXUI
 - C++20 compiler
 
 ## Installation
 
-    sudo make install
+### NixOS
 
-Alternatively if you want to just try mozart then run the following command :
-    
+#### User level installation
+
+Run the following command from the directory containing flake.nix
+
+    nix profile install .#mozart
+
+#### System level installation
+
+Just add the following block in your configuration.nix :
+
+    { config, pkgs, ... }:
+    let
+      mozartFlake = builtins.getFlake "/full/path/to/your/flake";
+    in {
+      environment.systemPackages = [
+        mozartFlake.packages.${pkgs.system}.mozart
+      ];
+    }
+
+And if you prefer flakes, add this flake as a dependency and include mozart in system packages:
+
+    {
+      inputs = {
+        mozart.url = "github:thestaccato/mozart";
+      };
+
+      outputs = { self, nixpkgs, mozart, ... }:
+        {
+          nixosConfigurations.myMachine = nixpkgs.lib.nixosSystem {
+            modules = [
+              ({ pkgs, ... }: {
+                environment.systemPackages = [
+                  mozart.packages.${pkgs.system}.default
+                ];
+              })
+            ];
+          };
+        };
+    }
+
+Or build from a local checkout (not recommended):
+
+    nix build
+    sudo cp ./result/bin/mozart /usr/local/bin/
+
+#### Local run
+
+To build and run without installing:
+
+    nix build
+    ./result/bin/mozart
+
+Or with make (have to use "nix develop" command first):
+
     make && ./mozart
 
-## Usage
+### Other Distributions
 
+Just run the following command (if necessary as root) : 
 
-    mozart [directories...]
+    make clean install
 
-## Controls
-
-### Normal mode
-
-| Key | Action |
-|-----|--------|
-| `Space` | Play / Pause |
-| `j` / `k` | Navigate playlist |
-| `↑` / `↓` | Navigate playlist |
-| `n` / `p` | Next / Previous track |
-| `Enter` | Play selected track |
-| `s` | Toggle shuffle |
-| `r` | Cycle repeat (off → one → all) |
-| `+` / `-` | Volume up / down |
-| `*` or `f` | Toggle star on selected |
-| `Tab` | Toggle filter (all / starred only) |
-| `a` | Add directory (recursive scan) |
-| `d` | Remove selected from library |
-| `←` / `→` | Seek back / forward 5s |
-| `Esc` | Clear status / cancel input |
-| `q` or `Ctrl-C` | Quit |
-
-Library and stars are persisted to `~/.config/mozart/`.
+## License
+Licensed under [GPL-3.0](LICENSE)
