@@ -1,12 +1,19 @@
 # Mozart - terminal music player
 
 A fast, minimal and suckless TUI music player.
+On Linux, Mozart registers itself as `org.mpris.MediaPlayer2.mozart` on the
+session bus, so it shows up in MPRIS-aware status bars (e.g. Waybar's `mpris`
+module) and media control tools. On other platforms it builds without MPRIS.
+
+    make MPRIS=1    # Linux build with MPRIS (default on Linux)
+    make MPRIS=0    # universal build without MPRIS
 
 ## Dependencies
 
 - libVLC
 - FTXUI
 - C++20 compiler
+- sdbus-c++ 2.x (Linux only, for MPRIS support)
 
 ## Installation
 

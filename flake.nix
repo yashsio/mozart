@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
@@ -23,7 +23,11 @@
             buildInputs = with pkgs; [
               ftxui
               libvlc
+            ] ++ pkgs.lib.optionals stdenv.isLinux [
+              sdbus-cpp_2
             ];
+
+            makeFlags = pkgs.lib.optionals pkgs.stdenv.isLinux [ "MPRIS=1" ];
 
             buildPhase = ''
               runHook preBuild

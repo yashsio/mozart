@@ -2,6 +2,7 @@
 #include "ui.h"
 #include "config.h"
 #include "util.h"
+#include "mpris.h"
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/event.hpp>
@@ -63,6 +64,7 @@ int main(int argc, char* argv[]) {
     }
 
     int sel = std::clamp(lastTrack >= 0 ? lastTrack : 0, 0, std::max(0, (int)files.size() - 1));
+    Mpris mpris(player, shuffle, repeat, volume);
     bool searchMode = false;
     std::string searchQuery;
     bool inputMode = false;
@@ -114,6 +116,7 @@ int main(int argc, char* argv[]) {
 
     auto renderer = ftxui::Renderer([&] {
         player.pollAdvance();
+        mpris.update();
 
         int curTrack = player.currentIndex();
         if (curTrack != prevTrack && curTrack >= 0 && prevTrack >= -1) {
