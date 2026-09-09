@@ -42,7 +42,7 @@ And if you prefer flakes, add this flake as a dependency and include mozart in s
 
     {
       inputs = {
-        mozart.url = "github:thestaccato/mozart";
+        mozart.url = "github:yashsio/mozart";
       };
 
       outputs = { self, nixpkgs, mozart, ... }:
