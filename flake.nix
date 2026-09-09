@@ -43,7 +43,7 @@
 
             meta = with pkgs.lib; {
               description = "Minimal and suckless TUI music player";
-              homepage = "https://github.com/thestaccato/mozart";
+              homepage = "https://github.com/yashsio/mozart";
               license = licenses.gpl3;
               platforms = platforms.unix;
               mainProgram = "mozart";
