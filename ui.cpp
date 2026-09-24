@@ -58,8 +58,6 @@ Element buildUI(
     std::string volStr;
     volStr += ICON_VOL_UP;
     volStr += " ";
-    for (int i = 0; i < 10; i++)
-        volStr += (i < vol / 10) ? "\u2588" : "\u2591";
     volStr += " " + std::to_string(vol) + "%";
 
     std::string shufStr = shuffle ? std::string(ICON_SHUFFLE) : std::string(1, ' ');
