@@ -26,7 +26,7 @@ mozart: $(OBJS)
 main.o: main.cpp player.h ui.h config.h util.h mpris.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-player.o: player.cpp player.h
+player.o: player.cpp player.h util.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 util.o: util.cpp util.h

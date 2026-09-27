@@ -1,4 +1,5 @@
 #include "player.h"
+#include "util.h"
 #include <algorithm>
 #include <random>
 
@@ -62,14 +63,9 @@ void Player::onEvent(const libvlc_event_t* ev, void* ptr) {
         if (!media) break;
         const char* t = libvlc_media_get_meta(media, libvlc_meta_Title);
         if (t) {
-            p->m_title = t;
+            p->m_title = stripAudioExt(t);
         } else if (p->m_idx >= 0 && p->m_idx < (int)p->m_files.size()) {
-            std::string path = p->m_files[p->m_idx];
-            auto pos = path.find_last_of('/');
-            if (pos != std::string::npos) path = path.substr(pos + 1);
-            pos = path.find_last_of('.');
-            if (pos != std::string::npos) path = path.substr(0, pos);
-            p->m_title = path;
+            p->m_title = stripExt(p->m_files[p->m_idx]);
         }
         libvlc_media_release(media);
         break;
@@ -103,14 +99,9 @@ void Player::loadTrack(int idx) {
 
     const char* t = libvlc_media_get_meta(media, libvlc_meta_Title);
     if (t) {
-        m_title = t;
+        m_title = stripAudioExt(t);
     } else {
-        std::string path = m_files[idx];
-        auto pos = path.find_last_of('/');
-        if (pos != std::string::npos) path = path.substr(pos + 1);
-        pos = path.find_last_of('.');
-        if (pos != std::string::npos) path = path.substr(0, pos);
-        m_title = path;
+        m_title = stripExt(m_files[idx]);
     }
 
     libvlc_media_player_set_media(m_mp, media);

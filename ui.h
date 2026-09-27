@@ -25,7 +25,7 @@ ftxui::Element buildUI(
     Player& player,
     const std::vector<std::string>& files,
     const std::set<std::string>& starred,
-    int sel, bool showStarredOnly,
+    int sel, int& scrollOff, bool showStarredOnly,
     const std::string& searchQuery, bool searchMode,
     bool inputMode, const std::string& inputBuffer,
     const std::string& status, int statusLife,

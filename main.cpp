@@ -64,6 +64,7 @@ int main(int argc, char* argv[]) {
     }
 
     int sel = std::clamp(lastTrack >= 0 ? lastTrack : 0, 0, std::max(0, (int)files.size() - 1));
+    int scrollOff = 0;
     Mpris mpris(player, shuffle, repeat, volume);
     bool searchMode = false;
     std::string searchQuery;
@@ -146,7 +147,7 @@ int main(int argc, char* argv[]) {
 
         int starCount = (int)starred.size();
 
-        return buildUI(player, files, starred, sel, showStarredOnly,
+        return buildUI(player, files, starred, sel, scrollOff, showStarredOnly,
                        searchQuery, searchMode, inputMode, inputBuffer,
                        status, statusLife, shuffle, repeat,
                        starCount, cols, rows,
@@ -371,15 +372,17 @@ int main(int argc, char* argv[]) {
         if (e == ftxui::Event::PageDown || e == ftxui::Event::CtrlD) {
             struct winsize ws;
             ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
-            int half = std::max(1, (ws.ws_row - 12) / 2);
-            for (int i = 0; i < half; i++) sel = nextVis(sel, 1);
+            int page = std::max(1, playlistBodyRows(ws.ws_row > 0 ? ws.ws_row : 24,
+                                                    player.songCount() > 0) - 1);
+            for (int i = 0; i < page; i++) sel = nextVis(sel, 1);
             return true;
         }
         if (e == ftxui::Event::PageUp || e == ftxui::Event::CtrlU) {
             struct winsize ws;
             ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
-            int half = std::max(1, (ws.ws_row - 12) / 2);
-            for (int i = 0; i < half; i++) sel = nextVis(sel, -1);
+            int page = std::max(1, playlistBodyRows(ws.ws_row > 0 ? ws.ws_row : 24,
+                                                    player.songCount() > 0) - 1);
+            for (int i = 0; i < page; i++) sel = nextVis(sel, -1);
             return true;
         }
         if (e == ftxui::Event::Home) {

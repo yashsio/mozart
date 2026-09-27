@@ -25,7 +25,7 @@ Element buildUI(
     Player& player,
     const std::vector<std::string>& files,
     const std::set<std::string>& starred,
-    int sel, bool showStarredOnly,
+    int sel, int& scrollOff, bool showStarredOnly,
     const std::string& searchQuery, bool searchMode,
     bool inputMode, const std::string& inputBuffer,
     const std::string& status, int statusLife,
@@ -133,9 +133,39 @@ Element buildUI(
     if (totalVis > 0) libLabel += " (" + std::to_string(totalVis) + ")";
     std::string libRight;
     if (showStarredOnly) libRight += std::string(ICON_STAR) + " filtered";
-    if (totalVis > 0 && visPos >= 0) {
+
+    // ── Playlist ──
+    int bodyRows = playlistBodyRows(rows, hasSongs);
+    int avail = 0;
+    bool hasAbove = false;
+    bool hasBelow = false;
+
+    // The "N more" rows share the playlist height, but never at the cost of
+    // hiding every track: an indicator only gets a row once one item row is
+    // left over. Returns how many track rows fit at the given offset.
+    auto layout = [&](int off) {
+        int ind = (off > 0 ? 1 : 0) + (totalVis > off + bodyRows ? 1 : 0);
+        ind = std::min(ind, std::max(0, bodyRows - 1));
+        hasAbove = ind > 0 && off > 0;
+        hasBelow = ind - (hasAbove ? 1 : 0) > 0;
+        return bodyRows - ind;
+    };
+
+    if (bodyRows > 0) {
+        avail = layout(scrollOff);
+        if (visPos >= 0) {
+            if (visPos < scrollOff) scrollOff = visPos;
+            else if (visPos >= scrollOff + avail) scrollOff = visPos - avail + 1;
+        }
+        scrollOff = std::clamp(scrollOff, 0, std::max(0, totalVis - 1));
+        avail = std::min(layout(scrollOff), std::max(0, totalVis - scrollOff));
+    }
+
+    if (totalVis > 0 && avail > 0) {
         if (!libRight.empty()) libRight += "  ";
-        libRight += std::to_string(visPos + 1) + "/" + std::to_string(totalVis);
+        libRight += std::to_string(scrollOff + 1) + "-"
+                  + std::to_string(scrollOff + avail) + "/"
+                  + std::to_string(totalVis);
     }
 
     Element libHeader = hbox({
@@ -144,21 +174,6 @@ Element buildUI(
         text(libRight) | dim,
         text("  "),
     });
-
-    // ── Playlist ──
-    int innerRows = rows - 2;
-    int fixed = 1 + 1 + (int)np.size() + 1 + 1 + 1 + 1 + 1;
-    int avail = std::max(0, innerRows - fixed);
-
-    int scrollOff = 0;
-    if (visPos >= 0) {
-        if (visPos >= scrollOff + avail) scrollOff = visPos - avail + 1;
-        if (visPos < scrollOff) scrollOff = visPos;
-    }
-    if (scrollOff < 0) scrollOff = 0;
-
-    bool hasAbove = scrollOff > 0;
-    bool hasBelow = totalVis > scrollOff + avail;
 
     Elements pl;
     for (int vi = scrollOff; vi < totalVis && vi < scrollOff + avail; vi++) {

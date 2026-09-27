@@ -12,6 +12,13 @@ std::string stripExt(const std::string& path) {
     return name;
 }
 
+std::string stripAudioExt(const std::string& name) {
+    auto pos = name.find_last_of('.');
+    if (pos == std::string::npos || pos == 0) return name;
+    if (!isAudio(name.substr(pos))) return name;
+    return name.substr(0, pos);
+}
+
 std::string fmtTime(int64_t ms) {
     if (ms < 0) ms = 0;
     int s = (int)(ms / 1000);
@@ -30,6 +37,15 @@ bool isAudio(const std::string& ext) {
     std::transform(e.begin(), e.end(), e.begin(), ::tolower);
     return e == ".mp3" || e == ".wav" || e == ".flac" || e == ".ogg"
         || e == ".aac" || e == ".m4a" || e == ".wma" || e == ".opus";
+}
+
+int playlistBodyRows(int rows, bool hasSongs) {
+    // Rows the playlist may use: terminal height minus the window border (2),
+    // the splash line, the three separators, the library header, the status
+    // line and the now-playing block.
+    int innerRows = rows - 2;
+    int fixed = 7 + (hasSongs ? 5 : 4);
+    return std::max(0, innerRows - fixed);
 }
 
 int colWidth(const std::string& s) {
