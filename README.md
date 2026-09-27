@@ -8,6 +8,10 @@ module) and media control tools. On other platforms it builds without MPRIS.
     make MPRIS=1    # Linux build with MPRIS (default on Linux)
     make MPRIS=0    # universal build without MPRIS
 
+
+![Mozart](./.github/assets/mozart.png)
+
+
 ## Dependencies
 
 - libVLC
@@ -19,57 +23,35 @@ module) and media control tools. On other platforms it builds without MPRIS.
 
 ### NixOS
 
+#### With NUR 
+If you prefer Home Manager use the following:
+
+    home.packages = with pkgs; [
+        nur.repos.yashsio.mozart
+    ];
+
+If you don't use Home Manager use the following:
+
+    environment.systemPackages = [
+        nur.repos.yashsio.mozart
+    ];
+
 #### User level installation
 
 Run the following command from the directory containing flake.nix
 
     nix profile install .#mozart
 
-#### System level installation
-
-Just add the following block in your configuration.nix :
-
-    { config, pkgs, ... }:
-    let
-      mozartFlake = builtins.getFlake "/full/path/to/your/flake";
-    in {
-      environment.systemPackages = [
-        mozartFlake.packages.${pkgs.system}.mozart
-      ];
-    }
-
-And if you prefer flakes, add this flake as a dependency and include mozart in system packages:
-
-    {
-      inputs = {
-        mozart.url = "github:yashsio/mozart";
-      };
-
-      outputs = { self, nixpkgs, mozart, ... }:
-        {
-          nixosConfigurations.myMachine = nixpkgs.lib.nixosSystem {
-            modules = [
-              ({ pkgs, ... }: {
-                environment.systemPackages = [
-                  mozart.packages.${pkgs.system}.default
-                ];
-              })
-            ];
-          };
-        };
-    }
-
-Or build from a local checkout (not recommended):
-
-    nix build
-    sudo cp ./result/bin/mozart /usr/local/bin/
-
-#### Local run
+#### Build and run locally (for testing)
 
 To build and run without installing:
 
     nix build
     ./result/bin/mozart
+
+    or 
+
+    nix run
 
 Or with make (have to use "nix develop" command first):
 
